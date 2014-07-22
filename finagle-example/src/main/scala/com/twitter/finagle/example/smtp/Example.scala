@@ -1,6 +1,7 @@
-package com.twitter.finagle
+package com.twitter.finagle.example.smtp
 
-import com.twitter.finagle.smtp.{EmailBuilder, EmailMessage}
+import com.twitter.finagle.{SmtpSimple, smtp}
+import com.twitter.finagle.smtp.EmailBuilder
 import com.twitter.util.{Await, Future}
 
 /**
