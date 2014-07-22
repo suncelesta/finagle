@@ -1,41 +1,36 @@
 package com.twitter.finagle.example.smtp
 
-import com.twitter.logging.Logger
-import com.twitter.finagle.smtp._
-import com.twitter.finagle.SmtpSimple
+import com.twitter.finagle.{SmtpSimple, smtp}
+import com.twitter.finagle.smtp.EmailBuilder
 import com.twitter.util.{Await, Future}
 
 /**
- * Simple SMTP client with an example of error handling.
+ * Simple SMTP client with an example of error handling
  */
 object Example {
-  private val log = Logger.get(getClass)
-
-  def main(args: Array[String]): Unit = {
-    // Raw text email
-    val email = DefaultEmail()
-      .from_("from@from.com")
-      .to_("first@to.com", "second@to.com")
-      .subject_("test")
-      .text("first line", "second line") //body is a sequence of lines
-
-    // Connect to a local SMTP server
-    val send = SmtpSimple.newService("localhost:2525")
-
-    // Send email
-    val res: Future[Unit] = send(email) onFailure {
-    // An error group
-    case ex: reply.SyntaxErrorReply => log.error("Syntax error: %s", ex.info)
-
-    // A concrete reply
-    case reply.ProcessingError(info) => log.error("Error processing request: %s", info)
+  def main(args: Array[String]) = {
+    //raw text email
+    val email = EmailBuilder()
+                .sender("from@from.com")
+                .to("first@to.com", "second@to.com")
+                .subject("test")
+                .text("text")
+                .build
+    //connect to a local SMTP server
+    val send = SmtpSimple.newService("localhost:25")
+    //send email
+    val res: Future[Unit] = send(email)
+      .onFailure {
+      //An error group
+      case ex: smtp.reply.SyntaxErrorReply => println("Syntax error: ", ex.info)
+      //A concrete reply
+      case smtp.reply.ProcessingError(info) => println("Error processing request: ", info)
     }
 
-    log.info("Sending email...")
+    println("Sending email...") //this will be printed before the future returns
 
+    //blocking just for test purposes
     Await.ready(res)
-    send.close()
-
-    log.info("Sent")
+    println("Sent")
   }
 }
