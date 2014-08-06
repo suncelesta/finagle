@@ -17,7 +17,7 @@ object Example {
                 .sender("from@from.com")
                 .to("first@to.com", "second@to.com")
                 .subject("test")
-                .addBodyLines("first line", "second line") //body is a sequence of lines
+                .text("text")
                 .build
 
     // Connect to a local SMTP server
