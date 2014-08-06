@@ -1,42 +1,36 @@
 package com.twitter.finagle.example.smtp
 
+import com.twitter.finagle.{SmtpSimple, smtp}
+import com.twitter.finagle.smtp.EmailBuilder
 import com.twitter.util.{Await, Future}
-import com.twitter.finagle.smtp._
-import com.twitter.finagle.SmtpSimple
-import com.twitter.logging.Logger
 
 /**
- * Simple SMTP client with an example of error handling.
+ * Simple SMTP client with an example of error handling
  */
 object Example {
-  private val log = Logger.get(getClass)
-
   def main(args: Array[String]) = {
-    // Raw text email
+    //raw text email
     val email = EmailBuilder()
                 .sender("from@from.com")
                 .to("first@to.com", "second@to.com")
                 .subject("test")
                 .text("text")
                 .build
-
-    // Connect to a local SMTP server
+    //connect to a local SMTP server
     val send = SmtpSimple.newService("localhost:25")
-
-    // Send email
+    //send email
     val res: Future[Unit] = send(email)
       .onFailure {
-      // An error group
-      case ex: reply.SyntaxErrorReply => log.error("Syntax error: ", ex.info)
-
-      // A concrete reply
-      case reply.ProcessingError(info) => log.error("Error processing request: ", info)
+      //An error group
+      case ex: smtp.reply.SyntaxErrorReply => println("Syntax error: ", ex.info)
+      //A concrete reply
+      case smtp.reply.ProcessingError(info) => println("Error processing request: ", info)
     }
 
-    println("Sending email...") // This will be printed before the future returns
+    println("Sending email...") //this will be printed before the future returns
 
+    //blocking just for test purposes
     Await.ready(res)
-
     println("Sent")
   }
 }
