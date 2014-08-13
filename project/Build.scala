@@ -362,7 +362,7 @@ object Finagle extends Build {
       sharedSettings
   ).settings(
       name := "finagle-smtp",
-      libraryDependencies ++= Seq(util("logging"), util("codec"))
+      libraryDependencies ++= Seq(util("logging"))
     ).dependsOn(finagleCore)
 
 /*  notyet
