@@ -75,6 +75,8 @@ class SmtpClientDispatcher(trans: Transport[Request, UnspecifiedReply])
       }
   }
 
+  override def close(deadline: Time): Future[Unit] = apply(Request.Quit).unit ensure super.close(deadline)
+
   /**
    * Dispatch and log a request, satisfying Promise `p` with the response;
    * the returned Future is satisfied when the dispatch is complete:
