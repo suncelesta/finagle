@@ -159,9 +159,15 @@ object Finagle extends Build {
     finagleExp, finagleMdns, finagleTesters,
 
     // Protocols
+<<<<<<< HEAD
     finagleHttp, finagleStream, finagleNative, finagleThrift,
     finagleMemcached, finagleKestrel, finagleRedis,
     finagleMux, finagleThriftMux, finagleMySQL, finagleSpdy, finagleSmtp,
+=======
+    finagleHttp, finagleHttpX, finagleStream, finagleNative, finagleThrift,
+    finagleMemcached, finagleMemcachedX, finagleKestrel, finagleKestrelX, 
+    finagleRedis, finagleMux, finagleThriftMux, finagleMySQL, finagleSpdy,
+>>>>>>> finagle: define sbt builds for -x projects
 
     // Use and integration
     // removing benchmark because swift can't build outside of twitter for now
@@ -296,6 +302,22 @@ object Finagle extends Build {
     )
   ).dependsOn(finagleCore)
 
+  // see https://finagle.github.io/blog/2014/10/20/upgrading-finagle-to-netty-4/
+  // for an explanation of the role of transitional -x packages in the netty4 migration.
+  lazy val finagleHttpX = Project(
+    id = "finagle-httpx",
+    base = file("finagle-httpx"),
+    settings = Project.defaultSettings ++
+      sharedSettings
+  ).settings(
+    name := "finagle-httpx",
+    libraryDependencies ++= Seq(
+      util("codec"), util("logging"),
+      "commons-lang" % "commons-lang" % "2.6",
+      "com.google.guava" % "guava" % "16.0.1"
+    )
+  ).dependsOn(finagleCore)
+
   lazy val finagleNative = Project(
     id = "finagle-native",
     base = file("finagle-native"),
@@ -338,6 +360,20 @@ object Finagle extends Build {
     ) ++ jacksonLibs
   ).dependsOn(finagleCore, finagleServersets)
 
+  lazy val finagleMemcachedX = Project(
+    id = "finagle-memcachedx",
+    base = file("finagle-memcachedx"),
+    settings = Project.defaultSettings ++
+      sharedSettings
+  ).settings(
+    name := "finagle-memcachedx",
+    libraryDependencies ++= Seq(
+      util("hashing"),
+      "com.google.guava" % "guava" % "16.0.1",
+      "com.twitter.common" % "zookeeper-testing" % "0.0.46" % "test"
+    ) ++ jacksonLibs
+  ).dependsOn(finagleCore, finagleServersets)
+
   lazy val finagleKestrel = Project(
     id = "finagle-kestrel",
     base = file("finagle-kestrel"),
@@ -349,6 +385,7 @@ object Finagle extends Build {
     libraryDependencies ++= scroogeLibs
   ).dependsOn(finagleCore, finagleMemcached, finagleThrift)
 
+
   lazy val finagleSmtp = Project(
     id = "finagle-smtp",
     base = file("finagle-smtp"),
@@ -358,6 +395,17 @@ object Finagle extends Build {
       name := "finagle-smtp",
       libraryDependencies ++= Seq(util("logging"), util("codec"))
     ).dependsOn(finagleCore)
+
+  lazy val finagleKestrelX = Project(
+    id = "finagle-kestrelx",
+    base = file("finagle-kestrelx"),
+    settings = Project.defaultSettings ++
+      ScroogeSBT.newSettings ++
+      sharedSettings
+  ).settings(
+    name := "finagle-kestrelx",
+    libraryDependencies ++= scroogeLibs
+  ).dependsOn(finagleCore, finagleMemcachedX, finagleThrift)
 
 /*  notyet
   lazy val finagleProtobuf = Project(
