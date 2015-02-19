@@ -35,6 +35,6 @@ object Example {
 
     //blocking just for test purposes
     Await.ready(res)
-    println("Sent")
+    log.info("Sent")
   }
 }
